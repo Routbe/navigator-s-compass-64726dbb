@@ -13,8 +13,8 @@ import { IntegrationVault } from "./IntegrationVault";
 const SUGGESTED = ["spotify", "github", "youtube", "bluesky", "wsocial", "lichess", "chesscom", "wakatime"];
 
 const TABS: { id: "suggested" | "all" | IntegrationCategory; label: string }[] = [
-  { id: "suggested", label: "⭐ Voorgesteld" },
-  { id: "all", label: "🌐 Alles" },
+  { id: "suggested", label: "⭐ Aanbevolen" },
+  { id: "all", label: "Alles" },
   { id: "music", label: "Muziek" },
   { id: "gaming", label: "Gaming" },
   { id: "streaming", label: "Streaming" },
@@ -125,7 +125,7 @@ export function AddLiveIntegrationModal({ open, onClose }: { open: boolean; onCl
               {list.length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">Geen diensten gevonden.</p>
               ) : (
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="flex flex-col gap-2">
                   {list.map((item) => {
                     const soon = item.mode === "soon";
                     const row = rowFor(item.id);
