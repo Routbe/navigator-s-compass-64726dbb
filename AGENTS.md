@@ -26,7 +26,7 @@
 - Apply migrations with bun scripts/migrate-gateway.ts: statements split, one batch per transaction, tracked in schema_migrations. Why: gateway rejects multi-statement queries.
 - Deployment mode comes only from `src/lib/app-mode.ts` (`VITE_APP_MODE`/`APP_MODE`): `appModeMiddleware` in `src/start.ts` 404s admin paths in public mode and confines admin mode to the portal (noindex), `assertAdminRole` refuses in public mode, and `api_.auth.$.ts` refuses social providers in admin mode. Why: the split must hold server-side, never only in the UI.
 - Build mode filters route files via app-mode-routes.ts; admin files use admin.* names. Why: public bundles must exclude admin code.
-- Shells load lazily by path; public builds exclude admin code. Preview mode overrides are UI-only. Why: previews must never loosen server access.
+- Shells load lazily; preview mode overrides are UI-only. Why: previews never loosen server access.
 - Stamps: lock links before redeeming in one gateway transaction; enforce public profile visibility. Why: no cap overruns or private collections leaked.
 - Open-web ownership is proven only by the server-side bio-check (`open-web-rules.ts` + `checkBioVerify`): `verified_via` is 'sso' or 'bio', and changing the handle drops bio verification. User-supplied fetch hosts (RSS, Mastodon) must pass `isPublicHost`. Why: no OAuth, no trust in client input, no SSRF.
 - Guestbook (`guestbook.server.ts`, db/90): only signed-in members post, owners pin/delete via `owner_id` checks, public reads return pinned notes of public profiles only. Why: verified network effect, no spam, privacy enforced server-side.
