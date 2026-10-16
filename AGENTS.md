@@ -19,7 +19,7 @@
 - Every sign-in method returns through `/auth/continue`; destinations and tour drafts use HttpOnly cookies, never URLs. Tour drafts apply only to new accounts; taken handles fall back to onboarding. Why: zero-hop redirects, no token leakage, existing members never overwritten. Auth emails use `sendLocalizedEmail` with static template IDs and non-blocking dispatch so provider outages never break sign-in.
 - ALTCHA uses self-hosted single-use proofs; db/54 owns replay DDL, unavailable storage fails closed, invalid proofs are refused before auth. Why: least privilege without weaker bot protection.
 - Community stats are live counts; reviews show only when `approved` (db/65); empty sections hide. Approving a verification cancels that user's other open same-tier requests (`verification-dedupe.ts`). Why: no fake social proof or duplicate work.
-- Vercel builds use nitro's `vercel` preset (via `VERCEL`); sandbox forces cloudflare.
+- Vercel builds: nitro `vercel` preset; sandbox: cloudflare.
 - Third-party images on public pages load only via `/api/public/proxy-image` (host allowlist in `src/lib/image-proxy-rules.ts`). Why: visitors' IPs must never reach third-party image hosts.
 - Emailed action links (review, booking) only confirm on GET, change on POST; status mails send fire-and-forget. Why: scanners open links; mail failures never block actions.
 - 2FA/passkeys: Better Auth `twoFactor` + `@better-auth/passkey`, tables in `neon_auth` (db/77). Why: no custom crypto.
