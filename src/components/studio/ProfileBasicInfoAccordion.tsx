@@ -11,6 +11,13 @@ import { AVATAR_SHAPES, type AvatarShape, type ProfileDisplayPrefs } from "@/lib
 import { type ProfileBlock } from "@/lib/profile";
 import { cn } from "@/lib/utils";
 import { VerifiedModal } from "./VerifiedModal";
+import { BadgeCheck, Clock } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { getVerificationState } from "@/lib/verification.functions";
+import { verificationCta } from "@/lib/studio-access";
 
 /** Tekens die de studio hard afdwingt (de server knipt ook nog eens af). */
 export const MAX_DISPLAY_NAME = 50;
@@ -89,6 +96,16 @@ export function ProfileBasicInfoAccordion({
   saving = false,
   savedAt = null,
 }: Props) {
+  const { t } = useI18n();
+  const { user } = useAuth();
+  const fetchState = useServerFn(getVerificationState);
+  const vstate = useQuery({
+    queryKey: ["verification-state", user?.id],
+    queryFn: () => fetchState(),
+    enabled: Boolean(user),
+    retry: false,
+  });
+  const cta = vstate.isLoading ? null : verificationCta(vstate.data);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [avatarSource, setAvatarSource] = useState("");
@@ -301,13 +318,23 @@ export function ProfileBasicInfoAccordion({
             >
               {t("studio.basic.editHandle")}
             </button>
-            <button
-              type="button"
-              onClick={() => setVerifyOpen(true)}
-              className="shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary hover:bg-primary/15"
-            >
-              {t("studio.basic.requestVerify")}
-            </button>
+            {cta === "verified" ? (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border px-2 py-1 text-[11px] font-medium">
+                <BadgeCheck className="h-3 w-3 text-primary" aria-hidden /> {t("studio.basic.verified")}
+              </span>
+            ) : cta === "pending" ? (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-muted-foreground">
+                <Clock className="h-3 w-3" aria-hidden /> {t("studio.basic.pending")}
+              </span>
+            ) : cta === "request" ? (
+              <button
+                type="button"
+                onClick={() => setVerifyOpen(true)}
+                className="shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary hover:bg-primary/15"
+              >
+                {t("studio.basic.requestVerify")}
+              </button>
+            ) : null}
             <VerifiedModal open={verifyOpen} onClose={() => setVerifyOpen(false)} />
             <button
               type="button"
