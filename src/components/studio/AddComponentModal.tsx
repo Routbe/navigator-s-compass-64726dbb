@@ -93,6 +93,9 @@ export const LIVE_COMPONENTS: { provider: string; note: string }[] = [
   { provider: "wsocial", note: "Laatste bericht" },
 ];
 
+/** Curated mix voor het tabblad "Aanbevolen". */
+const SUGGESTED_KINDS = ["link", "instagram", "text", "video", "media_gallery", "newsletter", "widget:questions", "widget:badges", "widget:reach"];
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -104,7 +107,7 @@ interface Props {
 
 /** De Component-bibliotheek: alles wat je aan je pagina kunt toevoegen. */
 export function AddComponentModal({ open, onClose, onAdd, handle, onWidget }: Props) {
-  const [tab, setTab] = useState<string>("live");
+  const [tab, setTab] = useState<string>("suggested");
   const [query, setQuery] = useState("");
   const [videoOpen, setVideoOpen] = useState(false);
   const [proOpen, setProOpen] = useState(false);
@@ -155,8 +158,14 @@ export function AddComponentModal({ open, onClose, onAdd, handle, onWidget }: Pr
   const liveMatches = LIVE_COMPONENTS.filter(({ provider, note }) =>
     !q || matches(integrationById(provider)?.label ?? provider) || matches(note));
   const groupMatches = COMPONENT_LIBRARY
-    .filter((g) => q || tab === g.id)
-    .map((g) => ({ ...g, items: g.items.filter((i) => available(i) && (!q || matches(i.label) || matches(i.note))) }))
+    .filter((g) => q || tab === "all" || tab === "suggested" || tab === g.id)
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((i) =>
+        available(i) &&
+        (!q || matches(i.label) || matches(i.note)) &&
+        (q || tab !== "suggested" || SUGGESTED_KINDS.includes(i.kind))),
+    }))
     .filter((g) => g.items.length > 0);
 
   const pickItem = (item: LibraryItem) => {
@@ -203,7 +212,7 @@ export function AddComponentModal({ open, onClose, onAdd, handle, onWidget }: Pr
             </label>
             {!q && (
               <div role="tablist" aria-label="Categorieën" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-                {[{ id: "live", title: "⚡ Live Status & Feeds" }, ...COMPONENT_LIBRARY].map((t) => (
+                {[{ id: "suggested", title: "⭐ Aanbevolen" }, { id: "all", title: "🌐 Alles" }, { id: "live", title: "⚡ Live Status & Feeds" }, ...COMPONENT_LIBRARY].map((t) => (
                   <button
                     key={t.id}
                     type="button"
@@ -217,7 +226,7 @@ export function AddComponentModal({ open, onClose, onAdd, handle, onWidget }: Pr
                 ))}
               </div>
             )}
-            {(q || tab === "live") && liveMatches.length > 0 && (
+            {(q || tab === "live" || tab === "all") && liveMatches.length > 0 && (
             <section className="space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">⚡ Live Status &amp; Feeds</h3>
@@ -225,7 +234,7 @@ export function AddComponentModal({ open, onClose, onAdd, handle, onWidget }: Pr
                   Alle koppelingen beheren
                 </button>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
                 {liveMatches.map(({ provider, note }) => {
                   const item = integrationById(provider);
                   if (!item) return null;
@@ -259,7 +268,7 @@ export function AddComponentModal({ open, onClose, onAdd, handle, onWidget }: Pr
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {group.title}
                 </h3>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="flex flex-col gap-2">
                   {group.items.map((item) => (
                       <button
                         key={item.kind}

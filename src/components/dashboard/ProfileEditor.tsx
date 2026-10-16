@@ -129,7 +129,7 @@ import {
 } from "@/lib/alias-profile.functions";
 import { SubdomainPanel } from "@/components/dashboard/SubdomainPanel";
 import { BadgesPanel } from "@/components/dashboard/BadgesPanel";
-import { TotalReachButton } from "@/components/dashboard/TotalReachModal";
+import { TotalReachToggle } from "@/components/studio/LiveIntegrations";
 import { BadgeActivityPanel } from "@/components/dashboard/BadgeActivityPanel";
 import { EmailForwardingPanel } from "@/components/dashboard/EmailForwardingPanel";
 import { EmailAliasDomains } from "@/components/dashboard/EmailAliasDomains";
@@ -980,7 +980,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                     <p className="text-sm text-muted-foreground">
                       Toon één badge met je totale volgersaantal over al je gekoppelde accounts.
                     </p>
-                    <TotalReachButton />
+                    <TotalReachToggle />
                   </section>
 
                 {/* 🏅 Badges: eigen map binnen Links & componenten, met schakelaar. */}
@@ -1079,6 +1079,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                       onPrefChange={setPref}
                       displayName={displayName}
                       bio={tagline}
+                      handle={normalized || handle}
                     />
                   </section>
                 </AccordionContent>
