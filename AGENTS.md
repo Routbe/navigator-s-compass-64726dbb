@@ -35,4 +35,4 @@
 - Live-status windows: `live-presence-rules.ts`, applied server-side. Why: no client trust.
 - Admin email entry checks configured owners or stored admin roles before auth; endpoint checks remain. Why: refuse members without granting privileges.
 - Profile sections use profile-section-blocks.ts and blocks; explicit hidden/scheduled sections suppress fallbacks. Why: no duplicate or resurrected content.
-- Never register a Supabase token attacher or add src/integrations/supabase; sessions are the HttpOnly rout_session cookie. Why: a global Supabase middleware broke every server function and sign-in.
+- No Supabase client or token middleware; sessions use the rout_session cookie. Why: it broke sign-in.
