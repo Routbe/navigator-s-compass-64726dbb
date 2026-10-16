@@ -42,6 +42,6 @@ describe("admin email entry", () => {
   it("refuses missing email and database failures", async () => {
     expect(await canUseAdminEmail(undefined)).toBe(false);
     state.unavailable = true;
-    await expect(canUseAdminEmail("member@example.com")).rejects.toThrow("database unavailable");
+    expect(await canUseAdminEmail("member@example.com")).toBe(false);
   });
 });
